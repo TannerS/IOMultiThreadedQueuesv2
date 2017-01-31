@@ -6,15 +6,12 @@ class BlockingQueue:
     mutex = None
     empty = None
     full = None
-    name = None
 
-    def __init__(self, name, max = 100):
+    def __init__(self, max = 100):
         self.queue = []
         self.empty = Semaphore(value=max)
         self.full = Semaphore(0)
         self.mutex = Lock()
-        # self.mutex = Semaphore(1) #mutex lock
-        self.name = name
 
     def enqueue(self, data):
         self.empty.acquire(blocking=True)
@@ -24,13 +21,12 @@ class BlockingQueue:
         self.full.release()
 
     def dequeue(self):
-        while True:
-            self.full.acquire(blocking=True)
-            self.mutex.acquire(blocking=True)
-            item = self.queue.pop(0)
-            self.mutex.release()
-            self.empty.release()
-            return item
+        self.full.acquire(blocking=True)
+        self.mutex.acquire(blocking=True)
+        item = self.queue.pop(0)
+        self.mutex.release()
+        self.empty.release()
+        return item
 
 
 
